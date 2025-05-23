@@ -14,7 +14,6 @@ docker-run:
 docker-self-check:
 	docker run --rm -e SELF_CHECK=1 $(DOCKER_IMAGE)
 
-check:
-	docker-build docker-self-check
+check: docker-build docker-self-check
 
 .PHONY: test docker-build docker-run docker-self-check check
