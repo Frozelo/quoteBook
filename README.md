@@ -9,7 +9,7 @@
 ### Локально (Go 1.21+)
 
 ```sh
-git clone https://github.com/your-username/quoteBook.git
+git clone https://github.com/Frozelo/quoteBook.git
 cd quoteBook
 go run ./cmd/main.go
 ```
@@ -112,6 +112,31 @@ go test ./internal/handlers
 ```
 
 ---
+
+## Работа с Makefile
+
+Добавлены команды для удобства запуска тестов и cборки docker в обычном и self-check режиме
+
+```sh
+  make test # запуск всех тестов
+```
+
+```sh
+  make docker-build # сборка docker-образа
+```
+  
+ ```sh 
+  make docker-build # запуск docker-образа в обычном режиме
+ ```
+
+```sh 
+  make docker-self-check # запуск self-check
+```
+
+```sh
+  make check # выполнить всё попорядку build + self_check
+```
+
 
 ## Примечания
 
