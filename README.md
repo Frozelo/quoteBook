@@ -98,7 +98,8 @@ docker run --rm -e SELF_CHECK=1 quote-book
 │   └── server/              # Обертка для cервера и graceful shutdown сервера
 ├── pkg/errors/              # Кастомные ошибки
 ├── README.md
-└── Dockerfile
+├── Makefile
+├── Dockerfile
 └── docker-compose.yml
 ```
 
