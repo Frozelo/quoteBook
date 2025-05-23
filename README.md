@@ -117,30 +117,35 @@ go test ./internal/handlers
 
 Добавлены команды для удобства запуска тестов и cборки docker в обычном и self-check режиме
 
+Запуск всех тестов
 ```sh
-  make test # запуск всех тестов
+make test
 ```
 
+Сборка docker-образа
 ```sh
-  make docker-build # сборка docker-образа
+make docker-build
 ```
-  
- ```sh 
-  make docker-build # запуск docker-образа в обычном режиме
+
+Запуск docker-образа в обычном режиме
+ ```sh
+ make docker-run
  ```
 
-```sh 
-  make docker-self-check # запуск self-check
+Запуск self-check
+```sh
+make docker-self-check
 ```
 
+Выполнить всё попорядку build + self_check
 ```sh
-  make check # выполнить всё попорядку build + self_check
+make check
 ```
 
 
 ## Примечания
 
-* Данные хранятся только в памяти (in-memory store).
+* Данные хранятся только в памяти (in-memory store) в виде слайса.
 * Используются только стандартные библиотеки Go и `gorilla/mux`.
 * Все curl-примеры и документация доступны в этом README.
 * Добавлены unit- и интеграционные тесты.
