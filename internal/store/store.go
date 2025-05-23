@@ -66,7 +66,7 @@ func (qs *Store) GetByAuthor(author string) []Quote {
 	}
 
 	if len(filtered) == 0 {
-		return nil
+		return filtered
 	}
 
 	return filtered
