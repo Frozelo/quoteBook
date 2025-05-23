@@ -9,4 +9,5 @@ import (
 func main() {
 	log.Println("load quote book app")
 	app.Run()
+
 }
