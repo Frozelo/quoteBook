@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"math/rand"
 	"net/http"
 	"slices"
 	"strconv"
@@ -24,6 +25,7 @@ type Quote struct {
 }
 
 var ErrQuoteNotFound = errors.New("quote not found")
+var ErrNoQuotes = errors.New("no quotes available")
 
 type Store struct {
 	mu     sync.Mutex
@@ -57,11 +59,43 @@ func (qs *Store) Add(quote *Quote) Quote {
 	return newQuote
 }
 
-func (qs *Store) Get() ([]Quote, error) {
+func (qs *Store) Get() []Quote {
 	qs.mu.Lock()
 	defer qs.mu.Unlock()
 
-	return qs.quotes, nil
+	return qs.quotes
+}
+
+func (qs *Store) GetByAuthor(author string) []Quote {
+	qs.mu.Lock()
+	defer qs.mu.Unlock()
+
+	filtered := make([]Quote, 0)
+
+	for _, q := range qs.quotes {
+		if q.Author == author {
+			filtered = append(filtered, q)
+		}
+	}
+
+	if len(filtered) == 0 {
+		return nil
+	}
+
+	return filtered
+}
+
+func (qs *Store) GetRandom() (Quote, error) {
+	qs.mu.Lock()
+	defer qs.mu.Unlock()
+
+	if len(qs.quotes) == 0 {
+		return Quote{}, ErrNoQuotes
+	}
+
+	idx := rand.Intn(len(qs.quotes))
+
+	return qs.quotes[idx], nil
 }
 
 func (qs *Store) Delete(id int) error {
@@ -101,15 +135,29 @@ func main() {
 	}).Methods("POST")
 
 	router.HandleFunc("/quotes", func(w http.ResponseWriter, r *http.Request) {
-		quotes, err := quoteStore.Get()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		author := r.URL.Query().Get("author")
+		var quotes []Quote
+
+		if author != "" {
+			quotes = quoteStore.GetByAuthor(author)
+		} else {
+			quotes = quoteStore.Get()
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(quotes)
+	}).Methods("GET")
+
+	router.HandleFunc("/quotes/random", func(w http.ResponseWriter, r *http.Request) {
+		quote, err := quoteStore.GetRandom()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(quote)
 	}).Methods("GET")
 
 	router.HandleFunc("/quotes/{id}", func(w http.ResponseWriter, r *http.Request) {
