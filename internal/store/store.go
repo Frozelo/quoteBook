@@ -1,22 +1,12 @@
-package main
+package store
 
 import (
-	"errors"
-	"log"
 	"math/rand"
-	"net/http"
 	"slices"
 	"sync"
 
-	"github.com/Frozelo/quoteBook/internal/handlers"
-	"github.com/Frozelo/quoteBook/internal/store"
-	"github.com/gorilla/mux"
+	appErrors "github.com/Frozelo/quoteBook/pkg/errors"
 )
-
-type AddQuoteReq struct {
-	Author string `json:"author"`
-	Quote  string `json:"quote"`
-}
 
 type Quote struct {
 	Id     int    `json:"id"`
@@ -24,16 +14,13 @@ type Quote struct {
 	Quote  string `json:"quote"`
 }
 
-var ErrQuoteNotFound = errors.New("quote not found")
-var ErrNoQuotes = errors.New("no quotes available")
-
 type Store struct {
 	mu     sync.Mutex
 	quotes []Quote
 	nextId int
 }
 
-func NewStore() *Store {
+func New() *Store {
 	return &Store{
 		quotes: make([]Quote, 0),
 		nextId: 1,
@@ -90,7 +77,7 @@ func (qs *Store) GetRandom() (Quote, error) {
 	defer qs.mu.Unlock()
 
 	if len(qs.quotes) == 0 {
-		return Quote{}, ErrNoQuotes
+		return Quote{}, appErrors.ErrNoQuotes
 	}
 
 	idx := rand.Intn(len(qs.quotes))
@@ -108,19 +95,5 @@ func (qs *Store) Delete(id int) error {
 			return nil
 		}
 	}
-	return ErrQuoteNotFound
-}
-
-func main() {
-	router := mux.NewRouter()
-	quoteStore := store.New()
-	quoteHandler := handlers.New(quoteStore)
-
-	router.HandleFunc("/quotes", quoteHandler.GetQuotes).Methods("GET")
-	router.HandleFunc("/quotes", quoteHandler.PostQuote).Methods("POST")
-	router.HandleFunc("/quotes/random", quoteHandler.GetRandomQuote).Methods("GET")
-	router.HandleFunc("/quotes/{id:[0-9]+}", quoteHandler.DeleteQuote).Methods("DELETE")
-
-	log.Println("Server started on port 8080")
-	http.ListenAndServe(":8080", router)
+	return appErrors.ErrQuoteNotFound
 }
