@@ -84,3 +84,36 @@ func TestDelete(t *testing.T) {
 		t.Error("expected store to be empty after delete")
 	}
 }
+
+func TestGetRandom_EmptyStore(t *testing.T) {
+	s := New()
+	_, err := s.GetRandom()
+	if !errors.Is(err, appErrors.ErrNoQuotes) {
+		t.Errorf("expected ErrNoQuotes, got %v", err)
+	}
+}
+
+func TestDelete_NotFound(t *testing.T) {
+	s := New()
+	err := s.Delete(999)
+	if !errors.Is(err, appErrors.ErrQuoteNotFound) {
+		t.Errorf("expected ErrQuoteNotFound, got %v", err)
+	}
+}
+
+func TestGetByAuthor_UnknownAuthor(t *testing.T) {
+	s := New()
+	s.Add(&Quote{Author: "A", Quote: "Q1"})
+	quotes := s.GetByAuthor("NoSuchAuthor")
+	if len(quotes) != 0 {
+		t.Errorf("expected 0 quotes, got %d", len(quotes))
+	}
+}
+
+func TestDelete_EmptyStore(t *testing.T) {
+	s := New()
+	err := s.Delete(1)
+	if !errors.Is(err, appErrors.ErrQuoteNotFound) {
+		t.Errorf("expected ErrQuoteNotFound when deleting from empty store, got %v", err)
+	}
+}
