@@ -28,7 +28,7 @@ func Run() {
 
 	router := mux.NewRouter()
 	quoteStore := store.New()
-	quoteHandler := handlers.New(quoteStore)
+	quoteHandler := handlers.New(logger, quoteStore)
 
 	router.HandleFunc("/quotes", quoteHandler.GetQuotes).Methods("GET")
 	router.HandleFunc("/quotes", quoteHandler.PostQuote).Methods("POST")

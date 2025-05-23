@@ -9,7 +9,7 @@ docker-build:
 	docker build -t $(DOCKER_IMAGE) .
 
 docker-run:
-	docker run --rm -p 8080:8080 $(DOCKER_IMAGE)
+	docker run --rm -p 8080:8080 $(DOCKER_IMAGE) | jq
 
 docker-self-check:
 	docker run --rm -e SELF_CHECK=1 $(DOCKER_IMAGE)
